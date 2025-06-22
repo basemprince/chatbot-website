@@ -1,0 +1,15 @@
+name: chatbot-env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.12
+  - ipykernel
+  - pip
+  - pip:
+    - fastapi
+    - uvicorn
+    - langchain
+    - openai
+    - python-dotenv
+    - langchain-community
