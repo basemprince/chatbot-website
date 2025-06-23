@@ -16,3 +16,4 @@ dependencies:
     - langchain-community
     - beautifulsoup4
     - faiss-cpu
+    - pre-commit

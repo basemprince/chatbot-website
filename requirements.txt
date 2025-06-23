@@ -1,9 +1,9 @@
+beautifulsoup4
+faiss-cpu
 fastapi
-uvicorn
 langchain
+langchain-community
 langchain-openai
 openai
 python-dotenv
-langchain-community
-beautifulsoup4
-faiss-cpu
+uvicorn
