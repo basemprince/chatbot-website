@@ -10,6 +10,7 @@ dependencies:
     - fastapi
     - uvicorn
     - langchain
+    - langchain-openai
     - openai
     - python-dotenv
     - langchain-community
