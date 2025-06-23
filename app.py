@@ -18,10 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = [
-    "https://www.basemshaker.com",
-    "http://localhost:5500", # for local development
-    ]
+    allow_origins = ["https://www.basemshaker.com", "http://localhost:5500"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
