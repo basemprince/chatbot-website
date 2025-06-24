@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langchain.chains import RetrievalQA
+from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
@@ -50,11 +51,15 @@ else:
             "https://www.basemshaker.com/pages/machine-learn.html",
             "https://www.basemshaker.com/pages/robotics.html",
             "https://www.basemshaker.com/pages/automation.html",
+            "https://www.basemshaker.com/pages/simulation.html",
+            "https://www.basemshaker.com/pages/design.html",
+            "https://www.basemshaker.com/pages/work-experience.html",
+            "https://www.basemshaker.com/pages/education-experience.html",
         ]
     )
     docs = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     split_docs = splitter.split_documents(docs)
 
     vectorstore = FAISS.from_documents(split_docs, embeddings)
@@ -62,6 +67,7 @@ else:
 
 # Create retriever + QA chain
 retriever = vectorstore.as_retriever()
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
 prompt_template = PromptTemplate.from_template(
     """
@@ -72,7 +78,9 @@ Your responses must be:
 - Direct (no generic introductions or repetition),
 - Base it on the retrieved content.
 
-Basem can go by the name "Basem Shaker" or "basem" or "sam”
+Basem can go by the name "Basem Shaker" or "basem" or "sam"
+- If the question is about Basem Shaker, answer it directly. if it is about you, answer it as if you are Basem Shaker's assistant, not Basem Shaker himself.
+- If the answer is not found in the context or in this pre-prompt, reply with: “I couldn't find a specific answer to that based on the available content.
 
 Context:
 {context}
@@ -82,10 +90,14 @@ Question:
 """
 )
 
-llm = ChatOpenAI(model_name="gpt-4.1-nano", temperature=0.1, max_tokens=500)
+llm = ChatOpenAI(model_name="gpt-4.1-nano", temperature=0.1, max_tokens=1000)
 
 qa_chain = RetrievalQA.from_chain_type(
-    llm=llm, retriever=retriever, return_source_documents=False, chain_type_kwargs={"prompt": prompt_template}
+    llm=llm,
+    retriever=retriever,
+    memory=memory,
+    return_source_documents=False,
+    chain_type_kwargs={"prompt": prompt_template},
 )
 
 
