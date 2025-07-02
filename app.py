@@ -51,8 +51,12 @@ else:
             "https://www.basemshaker.com/pages/machine-learn.html",
             "https://www.basemshaker.com/pages/robotics.html",
             "https://www.basemshaker.com/pages/automation.html",
-            # "https://www.basemshaker.com/pages/simulation.html",
-            # "https://www.basemshaker.com/pages/design.html",
+            "https://www.basemshaker.com/pages/simulation.html",
+            "https://www.basemshaker.com/pages/design.html",
+            "https://www.basemshaker.com/pages/project-management.html",
+            "https://www.basemshaker.com/pages/lean-manufacturing.html",
+            "https://www.basemshaker.com/pages/problem-solving.html",
+            "https://www.basemshaker.com/pages/technical-skills.html",
             "https://www.basemshaker.com/pages/work-experience.html",
             "https://www.basemshaker.com/pages/education-experience.html",
         ]
@@ -71,7 +75,7 @@ memory = ConversationBufferMemory(memory_key="chat_history", return_messages=Tru
 
 prompt_template = PromptTemplate.from_template(
     """
-You are Basem Shaker’s assistant, not Basem Shaker himself, you're just his assistant. Use only the provided context to answer the user's question.
+You are Basem Shaker’s assistant, not Basem Shaker himself, you're just his assistant so don't use the word I. Use only the provided context to answer the user's question.
 
 Your responses must be:
 - Concise (2–4 sentences max unless asked to elaborate),
