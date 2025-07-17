@@ -1,8 +1,10 @@
 import os
 import pathlib
+import uuid
+from datetime import datetime
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
@@ -30,14 +32,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # FastAPI schema
 class Message(BaseModel):
     text: str
-
+    session_id: str | None = None  # Optional session ID
 
 # Paths
 VECTORSTORE_PATH = "faiss_index"
+LOG_FILE = "conversations.log"
 
 # Load or create vectorstore
 embeddings = OpenAIEmbeddings()
@@ -66,7 +68,7 @@ else:
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     split_docs = splitter.split_documents(docs)
 
-    vectorstore = FAISS.from_documents(docs, embeddings)
+    vectorstore = FAISS.from_documents(split_docs, embeddings)
     vectorstore.save_local(VECTORSTORE_PATH)
 
 # Create retriever + QA chain
@@ -104,9 +106,24 @@ qa_chain = ConversationalRetrievalChain.from_llm(
     return_source_documents=False,
 )
 
+# Utility function to log conversations with session ID
+def log_conversation(session_id: str, user_msg: str, bot_response: str):
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    with open(LOG_FILE, "a") as f:
+        f.write(f"[{timestamp}] Session: {session_id}\n")
+        f.write(f"User: {user_msg}\n")
+        f.write(f"Bot: {bot_response}\n\n")
 
 # FastAPI endpoint
 @app.post("/chat")
 def chat_endpoint(msg: Message):
+    # Generate a session ID if not provided
+    session_id = msg.session_id if msg.session_id else str(uuid.uuid4())
+
     response = qa_chain.invoke({"question": msg.text, "chat_history": memory.chat_memory.messages})
-    return response["answer"]
+    answer = response["answer"]
+
+    # Save conversation to log file with session tracking
+    log_conversation(session_id, msg.text, answer)
+
+    return {"answer": answer, "session_id": session_id}
