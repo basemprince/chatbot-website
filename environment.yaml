@@ -17,3 +17,4 @@ dependencies:
     - beautifulsoup4
     - faiss-cpu
     - pre-commit
+    - firebase-admin
