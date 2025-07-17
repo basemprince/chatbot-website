@@ -7,3 +7,4 @@ langchain-openai
 openai
 python-dotenv
 uvicorn
+firebase-admin
