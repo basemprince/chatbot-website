@@ -29,7 +29,8 @@ if not openai_key:
     raise ValueError("OPENAI_API_KEY not found in .env")
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate("firebase-key.json")  # Downloaded from Firebase Console
+FIREBASE_KEY_PATH = os.getenv("FIREBASE_KEY_PATH", "/etc/secrets/firebase-key.json")
+cred = credentials.Certificate(FIREBASE_KEY_PATH)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
